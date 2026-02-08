@@ -1,0 +1,460 @@
+{% extends 'bookings/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <header class="relative min-h-[85vh] lg:min-h-[95vh] flex items-center justify-center overflow-hidden py-20 lg:py-0">
+        <div class="absolute inset-0 hero-gradient"></div>
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto lg:mb-32">
+            <div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/30 text-white mb-6 animate-fade-in">
+                <span class="text-yellow-400 font-bold">4.4★</span>
+                <span class="text-xs font-medium uppercase tracking-widest text-white/90">101 Verified Reviews</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6 leading-[1.1]">
+                Comfort & Convenience <br>
+                <span class="text-hotel-teal-light">in the Heart of Aba</span>
+            </h1>
+            <p class="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Free Wi-Fi • Free breakfast • Free parking — Book direct from <span class="font-bold text-white">₦{{ official_price|floatformat:0|intcomma }}</span> or compare prices with major booking platforms.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 lg:hidden">
+                <a href="#rooms" class="w-full sm:w-auto bg-hotel-teal text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-hotel-teal-dark transition-all shadow-xl hover:-translate-y-1 block text-center">
+                    Check availability
+                </a>
+                <button class="w-full sm:w-auto bg-white text-hotel-teal px-8 py-4 rounded-xl font-bold text-lg hover:bg-hotel-neutral-100 transition-all shadow-xl block">
+                    Compare prices
+                </button>
+            </div>
+        </div>
+        
+        <!-- Booking Bar (Desktop Only) -->
+        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-5xl px-4 hidden lg:block">
+            <form action="{% url 'check_availability' %}" method="POST" class="bg-white p-6 rounded-2xl shadow-2xl border border-hotel-neutral-200 grid grid-cols-4 gap-4 items-end">
+                {% csrf_token %}
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold uppercase tracking-[0.2em] text-hotel-teal/40">Check-In</label>
+                    <input type="date" name="check_in" value="2026-02-15" class="w-full border border-hotel-neutral-200 bg-hotel-neutral-50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-hotel-teal outline-none transition-all" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold uppercase tracking-[0.2em] text-hotel-teal/40">Check-Out</label>
+                    <input type="date" name="check_out" value="2026-02-16" class="w-full border border-hotel-neutral-200 bg-hotel-neutral-50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-hotel-teal outline-none transition-all" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold uppercase tracking-[0.2em] text-hotel-teal/40">Guests</label>
+                    <select name="guests" class="w-full border border-hotel-neutral-200 bg-hotel-neutral-50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-hotel-teal outline-none transition-all appearance-none cursor-pointer">
+                        <option value="1">1 Adult</option>
+                        <option value="2" selected>2 Adults, 0 Children</option>
+                        <option value="3">2 Adults, 1 Child</option>
+                    </select>
+                </div>
+                <input type="hidden" name="room_type" value="ALL">
+                <button type="submit" class="bg-hotel-teal text-white h-[50px] rounded-lg font-bold hover:bg-hotel-teal-dark transition-all shadow-lg hover:shadow-teal-500/20 uppercase tracking-widest text-xs">
+                    Search Availability
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Rooms Section -->
+    <section id="rooms" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-hotel-teal font-bold uppercase tracking-[0.2em] text-sm mb-4 block">Luxury Accommodations</span>
+                <h2 class="text-3xl md:text-5xl font-display font-bold text-hotel-neutral-800 mb-6">Our Rooms & Rates</h2>
+                <p class="text-hotel-neutral-800/60 max-w-2xl mx-auto text-lg leading-relaxed">
+                    Choose from well-appointed standard and deluxe rooms with pool or city views. All rooms include air conditioning, free Wi-Fi, and complimentary breakfast.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for room in rooms|slice:":3" %}
+                <!-- Room Card -->
+                <div class="group bg-white rounded-3xl overflow-hidden border border-hotel-neutral-200 shadow-sm hover:shadow-2xl transition-all duration-500">
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="{{ room.image|default:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=800' }}" alt="{{ room.get_room_type_display }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-hotel-teal shadow-sm">
+                            {{ room.view_type|default:"Pool View" }}
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-2xl font-display font-bold text-hotel-neutral-800">{{ room.get_room_type_display }}</h3>
+                                <p class="text-hotel-neutral-800/60 text-sm">{{ room.description|default:"Comfortable and elegant" }}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-hotel-teal font-bold text-xl">₦{{ room.price_per_night|floatformat:0|intcomma }}</span>
+                                <p class="text-[10px] uppercase font-bold tracking-tighter opacity-40">Per Night</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            {% if room.has_breakfast %}
+                            <li class="flex items-center text-sm text-hotel-neutral-800/80">
+                                <svg class="w-4 h-4 mr-3 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Complimentary Breakfast
+                            </li>
+                            {% endif %}
+                            {% if room.has_wifi %}
+                            <li class="flex items-center text-sm text-hotel-neutral-800/80">
+                                <svg class="w-4 h-4 mr-3 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Free High-Speed Wi-Fi
+                            </li>
+                            {% endif %}
+                            {% if room.has_ac %}
+                            <li class="flex items-center text-sm text-hotel-neutral-800/80">
+                                <svg class="w-4 h-4 mr-3 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Air Conditioning
+                            </li>
+                            {% endif %}
+                        </ul>
+                        <button class="w-full border-2 border-hotel-teal text-hotel-teal py-3 rounded-xl font-bold hover:bg-hotel-teal hover:text-white transition-all">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <!-- Fallback if no rooms in DB -->
+                <div class="col-span-full py-12 text-center text-hotel-neutral-800/40">
+                    <p>No rooms available in the database yet. Please check the admin panel.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if rooms.count > 3 %}
+            <div class="mt-12 text-center">
+                <a href="{% url 'check_availability' %}" class="inline-flex items-center space-x-2 bg-hotel-teal text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-hotel-teal-dark transition-all shadow-xl hover:-translate-y-1">
+                    <span>View More Accommodations</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+            </div>
+            {% endif %}
+
+
+            <!-- Price Comparison Widget -->
+            <div class="mt-24 bg-hotel-neutral-100 rounded-3xl p-8 lg:p-12 border border-hotel-neutral-200">
+                <div class="flex flex-col lg:flex-row items-center justify-between mb-10 text-center lg:text-left">
+                    <div class="mb-6 lg:mb-0">
+                        <h3 class="text-3xl font-display font-bold text-hotel-neutral-800 mb-2">Best Rate Guaranteed</h3>
+                        <p class="text-hotel-neutral-800/60 font-medium">Book direct and save up to 30% on your stay.</p>
+                    </div>
+                    <div class="bg-white px-8 py-4 rounded-2xl shadow-sm border border-hotel-neutral-200">
+                        <span class="text-xs font-bold uppercase tracking-wider text-hotel-teal/60 block mb-1">Direct Official Rate</span>
+                        <span class="text-4xl font-display font-bold text-hotel-teal">₦{{ official_price|floatformat:0|intcomma }}</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left min-w-[600px]">
+                        <thead>
+                            <tr class="text-xs font-bold uppercase tracking-widest text-hotel-teal/40 border-b border-hotel-neutral-200">
+                                <th class="pb-4">Booking Platform</th>
+                                <th class="pb-4">Inclusions</th>
+                                <th class="pb-4">Rate</th>
+                                <th class="pb-4">Price Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-hotel-neutral-200">
+                            {% for rate in ota_rates %}
+                            <tr class="group hover:bg-white/50 transition-colors">
+                                <td class="py-6 flex items-center">
+                                    <span class="font-bold text-hotel-neutral-800">{{ rate.platform_name }}</span>
+                                </td>
+                                <td class="py-6 text-sm text-hotel-neutral-800/60">{{ rate.inclusions }}</td>
+                                <td class="py-6 font-bold text-hotel-neutral-800">₦{{ rate.price|floatformat:0|intcomma }}</td>
+                                <td class="py-6">
+                                    <span class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full font-bold">
+                                        +₦{{ rate.price_diff|floatformat:0|intcomma }} More
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <!-- Fallback/Default values if DB is empty -->
+                             <tr class="group hover:bg-white/50 transition-colors">
+                                <td class="py-6 flex items-center"><span class="font-bold text-hotel-neutral-800">Expedia.com</span></td>
+                                <td class="py-6 text-sm text-hotel-neutral-800/60">Free breakfast • Free Wi-Fi</td>
+                                <td class="py-6 font-bold text-hotel-neutral-800">₦114,162</td>
+                                <td class="py-6"><span class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full font-bold">+₦33,662 More</span></td>
+                            </tr>
+                            <tr class="group hover:bg-white/50 transition-colors">
+                                <td class="py-6 flex items-center"><span class="font-bold text-hotel-neutral-800">ZenHotels.com</span></td>
+                                <td class="py-6 text-sm text-hotel-neutral-800/60">Free breakfast</td>
+                                <td class="py-6 font-bold text-hotel-neutral-800">₦126,831</td>
+                                <td class="py-6"><span class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full font-bold">+₦46,331 More</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-8 text-center sm:text-left">
+                    <p class="text-[11px] text-hotel-neutral-800/40 italic uppercase tracking-wider">Prices are indicative and subject to change. Direct booking offers the most secure and best value experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Amenities Section -->
+    <section id="amenities" class="py-24 bg-hotel-neutral-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- Left Column: Amenities List -->
+                <div>
+                    <span class="text-hotel-teal font-bold uppercase tracking-[0.2em] text-sm mb-4 block">Our Facilities</span>
+                    <h2 class="text-3xl md:text-5xl font-display font-bold text-hotel-neutral-800 mb-8">Designed for Your Comfort</h2>
+                    
+                    <div class="space-y-8">
+                        <!-- Amenity 1 -->
+                        <div class="flex items-start space-x-6">
+                            <div class="bg-hotel-teal/10 p-3 rounded-xl mt-1">
+                                <svg class="w-6 h-6 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707-.707"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-bold text-xl text-hotel-neutral-800 mb-2">Complimentary Breakfast</h4>
+                                <p class="text-hotel-neutral-800/60 leading-relaxed">Start your day with a curated selection of local and continental delicacies.</p>
+                            </div>
+                        </div>
+
+                        <!-- Amenity 2 -->
+                        <div class="flex items-start space-x-6">
+                            <div class="bg-hotel-teal/10 p-3 rounded-xl mt-1">
+                                <svg class="w-6 h-6 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071a9.05 9.05 0 0112.728 0M1 10V4l1 1h4l1-1h4l1 1h4l1-1h4l1 1v6m0 0l-10 10L1 10z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-bold text-xl text-hotel-neutral-800 mb-2">High-Speed Wi-Fi</h4>
+                                <p class="text-hotel-neutral-800/60 leading-relaxed">Stay connected with seamless, fiber-optic internet accessible in all rooms and public areas.</p>
+                            </div>
+                        </div>
+
+                        <!-- Amenity 3 -->
+                        <div class="flex items-start space-x-6">
+                            <div class="bg-hotel-teal/10 p-3 rounded-xl mt-1">
+                                <svg class="w-6 h-6 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-9.618 5.04 11.952 11.952 0 00-1.02 5.992c0 6.633 5.367 12 12 12s12-5.367 12-12a11.952 11.952 0 00-1.02-5.992z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-bold text-xl text-hotel-neutral-800 mb-2">Secure On-site Parking</h4>
+                                <p class="text-hotel-neutral-800/60 leading-relaxed">Travel with peace of mind knowing your vehicle is in our 24/7 monitored parking facility.</p>
+                            </div>
+                        </div>
+
+                        <!-- Amenity 4 -->
+                        <div class="flex items-start space-x-6">
+                            <div class="bg-hotel-teal/10 p-3 rounded-xl mt-1">
+                                <svg class="w-6 h-6 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-display font-bold text-xl text-hotel-neutral-800 mb-2">Air-Conditioned Serenity</h4>
+                                <p class="text-hotel-neutral-800/60 leading-relaxed">Every room is equipped with modern climate control for your ultimate comfort.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Image -->
+                <div class="flex items-center justify-center">
+                    <img src="{% static 'images/morning-workout.png' %}" alt="West-Swiss Hotel Amenities" class="w-full max-w-lg h-auto rounded-3xl shadow-2xl hover:scale-[1.02] transition-transform duration-500">
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Dining Section -->
+    <section id="dining" class="py-24 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2">
+                    <span class="text-hotel-teal font-bold uppercase tracking-[0.2em] text-sm mb-4 block">Serene Dining</span>
+                    <h2 class="text-3xl md:text-5xl font-display font-bold text-hotel-neutral-800 mb-6">Ease Your Stress <br>While You Eat</h2>
+                    <p class="text-hotel-neutral-800/60 text-lg leading-relaxed mb-8">
+                        Our restaurant provides a calm, neatly set dining experience. Enjoy a wide selection of local Nigerian delicacies and international favorites, all prepared fresh by our expert chefs.
+                    </p>
+                    <div class="bg-hotel-neutral-100 p-8 rounded-3xl border border-hotel-neutral-200 relative">
+                        <svg class="absolute top-6 left-6 w-12 h-12 text-hotel-teal/10" fill="currentColor" viewBox="0 0 32 32"><path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14c0-3.3-2.7-6-6-6zm12 0c-3.3 0-6 2.7-6 6v10h10V14c0-3.3-2.7-6-6-6z"></path></svg>
+                        <blockquote class="italic text-hotel-neutral-800 text-lg mb-4 relative z-10">
+                            "West Swiss Hotel's restaurant is so serene and neatly set up. No noise, just ease the stress while eating..."
+                        </blockquote>
+                        <cite class="text-hotel-teal font-bold text-sm uppercase tracking-widest block">— Verified Guest</cite>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 relative">
+                    <div class="grid grid-cols-2 gap-4">
+                        <img src="https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&q=80&w=600" alt="Dining Interior" class="rounded-2xl shadow-lg w-full h-64 object-cover transform translate-y-8">
+                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=600" alt="Gourmet Dish" class="rounded-2xl shadow-lg w-full h-64 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-hotel-teal font-bold uppercase tracking-[0.2em] text-sm mb-4 block">Visual Tour</span>
+                <h2 class="text-3xl md:text-5xl font-display font-bold text-hotel-neutral-800 mb-6">Experience West-Swiss</h2>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="h-64 overflow-hidden rounded-2xl group relative pointer-events-auto cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=800" alt="Hotel Exterior" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="h-64 overflow-hidden rounded-2xl group relative pointer-events-auto cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80&w=800" alt="Deluxe Room" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="h-64 overflow-hidden rounded-2xl group relative lg:col-span-2 lg:row-span-2 pointer-events-auto cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&q=80&w=1200" alt="Pool Area" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="h-64 overflow-hidden rounded-2xl group relative pointer-events-auto cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1590131167970-4b608c148281?auto=format&fit=crop&q=80&w=800" alt="Restaurant" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section id="location" class="py-24 bg-hotel-neutral-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-16">
+                <div class="lg:w-1/3">
+                    <span class="text-hotel-teal font-bold uppercase tracking-[0.2em] text-sm mb-4 block">Neighborhood</span>
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-hotel-neutral-800 mb-6">In the Heart of Aba</h2>
+                    <p class="text-hotel-neutral-800/60 mb-8 leading-relaxed">
+                        Conveniently located at 23A Margaret Avenue, GRA, Aba. Our location is rated <span class="font-bold text-hotel-teal">3.9/5</span> for sightseeing and recreation.
+                    </p>
+                </div>
+                <div class="lg:w-2/3 h-[450px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3973.5268842344757!2d7.350571614770534!3d5.104871496471385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMDYnMTcuNSJOIDfCsDIxJzA5LjAiRQ!5e0!3m2!1sen!2sng!4v1707405497000!5m2!1sen!2sng" 
+                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-hotel-teal font-bold uppercase tracking-[0.2em] text-sm mb-4 block">Get In Touch</span>
+                <h2 class="text-3xl md:text-5xl font-display font-bold text-hotel-neutral-800 mb-6">Contact Us</h2>
+                <p class="text-hotel-neutral-800/60 text-lg max-w-2xl mx-auto">
+                    Have questions? We'd love to hear from you. Send us a message or reach out on WhatsApp.
+                </p>
+            </div>
+
+            <!-- Display Django messages -->
+            {% if messages %}
+                {% for message in messages %}
+                <div class="mb-8 px-6 py-4 rounded-xl {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800{% else %}bg-red-50 border border-red-200 text-red-800{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Contact Form (Left) -->
+                <div class="bg-hotel-neutral-50 rounded-3xl p-8 lg:p-10 border border-hotel-neutral-200">
+                    <h3 class="text-2xl font-display font-bold text-hotel-neutral-800 mb-6">Send us a Message</h3>
+                    <form action="{% url 'contact' %}" method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Your Name</label>
+                            <input type="text" name="name" required class="w-full border border-hotel-neutral-200 bg-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-hotel-teal outline-none transition-all" placeholder="John Doe">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Email Address</label>
+                            <input type="email" name="email" required class="w-full border border-hotel-neutral-200 bg-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-hotel-teal outline-none transition-all" placeholder="john@example.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Phone Number (Optional)</label>
+                            <input type="tel" name="phone" class="w-full border border-hotel-neutral-200 bg-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-hotel-teal outline-none transition-all" placeholder="+234 XXX XXX XXXX">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Subject</label>
+                            <input type="text" name="subject" required class="w-full border border-hotel-neutral-200 bg-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-hotel-teal outline-none transition-all" placeholder="General Inquiry">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Message</label>
+                            <textarea name="message" rows="5" required class="w-full border border-hotel-neutral-200 bg-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-hotel-teal outline-none transition-all" placeholder="Tell us how we can help you..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-hotel-teal text-white py-4 rounded-xl font-bold text-lg hover:bg-hotel-teal-dark transition-all shadow-lg">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+
+                <!-- WhatsApp & Contact Info (Right) -->
+                <div class="space-y-8">
+                    <!-- WhatsApp Card -->
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-8 lg:p-10 border border-green-200 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-green-200/30 rounded-full -mr-16 -mt-16"></div>
+                        <div class="relative">
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-2xl mb-6">
+                                <svg class="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-display font-bold text-green-900 mb-3">Chat on WhatsApp</h3>
+                            <p class="text-green-800/80 mb-6 leading-relaxed">
+                                Get instant responses to your booking questions. Our team is available to assist you.
+                            </p>
+                            <a href="https://wa.me/2349012345678?text=Hello%20West-Swiss%20Hotel%2C%20I'd%20like%20to%20make%20a%20booking" target="_blank" class="inline-flex items-center justify-center w-full bg-green-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg hover:shadow-xl">
+                                <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                </svg>
+                                Start WhatsApp Chat
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="bg-hotel-neutral-50 rounded-3xl p-8 lg:p-10 border border-hotel-neutral-200">
+                        <h3 class="text-xl font-display font-bold text-hotel-neutral-800 mb-6">Contact Information</h3>
+                        <div class="space-y-5">
+                            <div class="flex items-start">
+                                <div class="bg-hotel-teal/10 p-2.5 rounded-lg mr-4">
+                                    <svg class="w-5 h-5 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-hotel-neutral-800 mb-1">Address</p>
+                                    <p class="text-hotel-neutral-800/60 text-sm">23A Margaret Avenue, GRA<br>Aba 450101, Abia State</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-hotel-teal/10 p-2.5 rounded-lg mr-4">
+                                    <svg class="w-5 h-5 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-hotel-neutral-800 mb-1">Phone</p>
+                                    <a href="tel:[Add hotel phone]" class="text-hotel-teal hover:underline text-sm">[Add hotel phone]</a>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-hotel-teal/10 p-2.5 rounded-lg mr-4">
+                                    <svg class="w-5 h-5 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-hotel-neutral-800 mb-1">Email</p>
+                                    <a href="mailto:reservations@westswisshotel.com" class="text-hotel-teal hover:underline text-sm">reservations@westswisshotel.com</a>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-hotel-teal/10 p-2.5 rounded-lg mr-4">
+                                    <svg class="w-5 h-5 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-hotel-neutral-800 mb-1">Check-in / Check-out</p>
+                                    <p class="text-hotel-neutral-800/60 text-sm">14:00 / 12:00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

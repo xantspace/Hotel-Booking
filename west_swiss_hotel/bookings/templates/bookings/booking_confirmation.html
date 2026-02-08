@@ -1,0 +1,151 @@
+{% extends 'bookings/base.html' %}
+{% load humanize %}
+
+{% block title %}Booking Confirmed | West-Swiss Hotel Aba{% endblock %}
+
+{% block content %}
+<main class="max-w-4xl mx-auto px-4 py-12 min-h-screen">
+    <!-- Success Icon & Header -->
+    <div class="text-center mb-12">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+            <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h1 class="text-3xl md:text-5xl font-display font-bold text-hotel-neutral-800 mb-4">Booking Confirmed!</h1>
+        <p class="text-hotel-neutral-800/60 text-lg max-w-2xl mx-auto">
+            Thank you for choosing West-Swiss Hotel Aba. We've sent a confirmation email to <strong>{{ booking.guest_email }}</strong>.
+        </p>
+    </div>
+
+    <!-- Booking Details Card -->
+    <div class="bg-white rounded-3xl p-8 lg:p-12 border border-hotel-neutral-200 shadow-lg mb-8">
+        <div class="flex items-center justify-between mb-8 pb-6 border-b border-hotel-neutral-200">
+            <div>
+                <h2 class="text-2xl font-display font-bold text-hotel-neutral-800">Booking Confirmation</h2>
+                <p class="text-hotel-neutral-800/60 text-sm">Reference #{{ booking.id }}</p>
+            </div>
+            <div class="px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-bold">
+                {{ booking.get_status_display }}
+            </div>
+        </div>
+
+        <!-- Guest Information -->
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <div>
+                <h3 class="text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-4">Guest Information</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-xs text-hotel-neutral-800/40 uppercase tracking-wider">Name</p>
+                        <p class="font-semibold text-hotel-neutral-800">{{ booking.guest_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-hotel-neutral-800/40 uppercase tracking-wider">Email</p>
+                        <p class="font-semibold text-hotel-neutral-800">{{ booking.guest_email }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-hotel-neutral-800/40 uppercase tracking-wider">Phone</p>
+                        <p class="font-semibold text-hotel-neutral-800">{{ booking.guest_phone }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-4">Reservation Details</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-xs text-hotel-neutral-800/40 uppercase tracking-wider">Room Type</p>
+                        <p class="font-semibold text-hotel-neutral-800">{{ booking.room.get_room_type_display }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-hotel-neutral-800/40 uppercase tracking-wider">Check-In</p>
+                        <p class="font-semibold text-hotel-neutral-800">{{ booking.check_in|date:"F j, Y" }} (14:00)</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-hotel-neutral-800/40 uppercase tracking-wider">Check-Out</p>
+                        <p class="font-semibold text-hotel-neutral-800">{{ booking.check_out|date:"F j, Y" }} (12:00)</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-hotel-neutral-800/40 uppercase tracking-wider">Number of Guests</p>
+                        <p class="font-semibold text-hotel-neutral-800">{{ booking.number_of_guests }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if booking.special_requests %}
+        <div class="mb-8 p-4 bg-hotel-neutral-50 rounded-xl">
+            <p class="text-xs text-hotel-neutral-800/40 uppercase tracking-wider mb-2">Special Requests</p>
+            <p class="text-sm text-hotel-neutral-800">{{ booking.special_requests }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Pricing Summary -->
+        <div class="bg-hotel-neutral-50 rounded-2xl p-6">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-4">Payment Summary</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between text-sm">
+                    <span class="text-hotel-neutral-800/60">{{ room.price_per_night|floatformat:0|intcomma }} × {{ num_nights }} night{{ num_nights|pluralize }}</span>
+                    <span class="font-semibold">₦{{ booking.total_price|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="flex items-center text-sm text-green-600">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Free Wi-Fi, Breakfast & Parking Included
+                </div>
+                <div class="pt-3 border-t border-hotel-neutral-200">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-hotel-neutral-800 text-lg">Total Amount</span>
+                        <span class="text-3xl font-display font-bold text-hotel-teal">₦{{ booking.total_price|floatformat:0|intcomma }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Next Steps Information -->
+    <div class="bg-hotel-teal/5 rounded-3xl p-8 border border-hotel-teal/20 mb-8">
+        <h3 class="text-xl font-display font-bold text-hotel-neutral-800 mb-6">What's Next?</h3>
+        <div class="space-y-4">
+            <div class="flex items-start">
+                <div class="bg-hotel-teal/10 p-2 rounded-lg mr-4">
+                    <svg class="w-5 h-5 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-hotel-neutral-800">Check Your Email</p>
+                    <p class="text-sm text-hotel-neutral-800/60">We've sent a detailed confirmation with your booking reference.</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="bg-hotel-teal/10 p-2 rounded-lg mr-4">
+                    <svg class="w-5 h-5 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-hotel-neutral-800">Arrival Time</p>
+                    <p class="text-sm text-hotel-neutral-800/60">Check-in starts at 14:00. Early check-in may be available upon request.</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="bg-hotel-teal/10 p-2 rounded-lg mr-4">
+                    <svg class="w-5 h-5 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-hotel-neutral-800">Questions?</p>
+                    <p class="text-sm text-hotel-neutral-800/60">Contact us at <a href="mailto:reservations@westswisshotel.com" class="text-hotel-teal hover:underline">reservations@westswisshotel.com</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="{% url 'home' %}" class="inline-flex items-center justify-center bg-hotel-teal text-white px-8 py-3 rounded-xl font-bold hover:bg-hotel-teal-dark transition-all shadow-lg">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Back to Homepage
+        </a>
+        <button onclick="window.print()" class="inline-flex items-center justify-center bg-white border-2 border-hotel-neutral-200 text-hotel-neutral-800 px-8 py-3 rounded-xl font-bold hover:bg-hotel-neutral-50 transition-all">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Print Confirmation
+        </button>
+    </div>
+</main>
+{% endblock %}

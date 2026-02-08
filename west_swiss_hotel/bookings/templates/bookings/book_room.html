@@ -1,0 +1,167 @@
+{% extends 'bookings/base.html' %}
+{% load humanize %}
+
+{% block title %}Book {{ room.get_room_type_display }} | West-Swiss Hotel Aba{% endblock %}
+
+{% block content %}
+<main class="max-w-4xl mx-auto px-4 py-12 min-h-screen">
+    <div class="mb-8">
+        <a href="{% url 'check_availability' %}?check_in={{ check_in }}&check_out={{ check_out }}" class="inline-flex items-center text-hotel-teal hover:text-hotel-teal-dark transition-colors font-medium">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Available Rooms
+        </a>
+    </div>
+
+    <h1 class="text-3xl md:text-5xl font-display font-bold mb-2">Complete Your Booking</h1>
+    <p class="text-hotel-neutral-800/60 mb-12">You're one step away from your stay at West-Swiss Hotel Aba</p>
+
+    <!-- Display Django messages -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="mb-8 px-6 py-4 rounded-xl {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800{% else %}bg-red-50 border border-red-200 text-red-800{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="grid lg:grid-cols-5 gap-8">
+        <!-- Booking Form (Left - 3 columns) -->
+        <div class="lg:col-span-3">
+            <div class="bg-white rounded-3xl p-8 lg:p-10 border border-hotel-neutral-200 shadow-sm">
+                <h2 class="text-2xl font-display font-bold text-hotel-neutral-800 mb-6">Guest Information</h2>
+                
+                <form method="POST" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                        <ul class="list-disc list-inside text-red-600 text-sm">
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Full Name *</label>
+                            {{ form.guest_name }}
+                            {% if form.guest_name.errors %}
+                                <p class="text-red-600 text-xs mt-1">{{ form.guest_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Email Address *</label>
+                            {{ form.guest_email }}
+                            {% if form.guest_email.errors %}
+                                <p class="text-red-600 text-xs mt-1">{{ form.guest_email.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Phone Number *</label>
+                        {{ form.guest_phone }}
+                        {% if form.guest_phone.errors %}
+                            <p class="text-red-600 text-xs mt-1">{{ form.guest_phone.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Check-In *</label>
+                            {{ form.check_in }}
+                            {% if form.check_in.errors %}
+                                <p class="text-red-600 text-xs mt-1">{{ form.check_in.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Check-Out *</label>
+                            {{ form.check_out }}
+                            {% if form.check_out.errors %}
+                                <p class="text-red-600 text-xs mt-1">{{ form.check_out.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Guests *</label>
+                            {{ form.number_of_guests }}
+                            {% if form.number_of_guests.errors %}
+                                <p class="text-red-600 text-xs mt-1">{{ form.number_of_guests.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold uppercase tracking-wider text-hotel-teal/60 mb-2">Special Requests (Optional)</label>
+                        {{ form.special_requests }}
+                        {% if form.special_requests.errors %}
+                            <p class="text-red-600 text-xs mt-1">{{ form.special_requests.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="w-full bg-hotel-teal text-white py-4 rounded-xl font-bold text-lg hover:bg-hotel-teal-dark transition-all shadow-lg">
+                        Confirm Booking
+                    </button>
+                    
+                    <p class="text-xs text-hotel-neutral-800/40 text-center">
+                        By clicking "Confirm Booking", you agree to our terms and conditions.
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Room Summary (Right - 2 columns) -->
+        <div class="lg:col-span-2">
+            <div class="bg-hotel-neutral-50 rounded-3xl p-8 border border-hotel-neutral-200 sticky top-24">
+                <h3 class="text-xl font-display font-bold text-hotel-neutral-800 mb-6">Booking Summary</h3>
+                
+                <!-- Room Image Placeholder -->
+                <div class="w-full h-48 bg-hotel-teal/10 rounded-2xl mb-6 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-hotel-teal/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                </div>
+
+                <h4 class="text-2xl font-display font-bold text-hotel-neutral-800 mb-2">{{ room.get_room_type_display }}</h4>
+                <p class="text-hotel-neutral-800/60 text-sm mb-6">{{ room.description }}</p>
+
+                <div class="space-y-3 mb-6 pb-6 border-b border-hotel-neutral-200">
+                    {% if room.has_breakfast %}
+                    <div class="flex items-center text-sm">
+                        <svg class="w-4 h-4 mr-2 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Complimentary Breakfast
+                    </div>
+                    {% endif %}
+                    {% if room.has_wifi %}
+                    <div class="flex items-center text-sm">
+                        <svg class="w-4 h-4 mr-2 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Free High-Speed Wi-Fi
+                    </div>
+                    {% endif %}
+                    {% if room.has_ac %}
+                    <div class="flex items-center text-sm">
+                        <svg class="w-4 h-4 mr-2 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Air Conditioning
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-hotel-neutral-800/60">Rate per night</span>
+                        <span class="font-bold">₦{{ room.price_per_night|floatformat:0|intcomma }}</span>
+                    </div>
+                    <div class="pt-3 border-t border-hotel-neutral-200">
+                        <div class="flex justify-between">
+                            <span class="font-bold text-hotel-neutral-800">Total</span>
+                            <span class="text-2xl font-display font-bold text-hotel-teal">₦{{ room.price_per_night|floatformat:0|intcomma }}</span>
+                        </div>
+                        <p class="text-[10px] text-hotel-neutral-800/40 text-right mt-1">Final price calculated after dates</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

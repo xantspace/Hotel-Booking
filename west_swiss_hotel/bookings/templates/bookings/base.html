@@ -1,0 +1,251 @@
+{% load static %}{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}West-Swiss Hotel Aba | Comfort & Serenity in GRA Aba, Abia{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Stay at West-Swiss Hotel Aba (4.4★, 101 reviews). Located in GRA Aba, offering free Wi-Fi, free breakfast, pool, and parking. Book direct from ₦80,500.{% endblock %}">
+    <meta name="keywords" content="Aba hotel, hotels in Aba, West Swiss Hotel Aba, Aba accommodation, hotels near GRA Aba, Abia State hotels">
+    <meta name="author" content="West-Swiss Hotel Aba">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://westswisshotelaba.com/">
+    <meta property="og:title" content="{% block og_title %}West-Swiss Hotel Aba | Comfort & Serenity in Aba{% endblock %}">
+    <meta property="og:description" content="Experience comfort and serenity at West-Swiss Hotel Aba. 4.4★ Rating, Free Breakfast, Pool & Wi-Fi included.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1200">
+
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Hotel",
+      "name": "West-Swiss Hotel Aba",
+      "description": "Premium hotel in Aba, Abia State, offering serene accommodations and top-tier amenities.",
+      "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1920",
+      "url": "https://westswisshotelaba.com/",
+      "telephone": "[Add hotel phone]",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "23A Margaret Avenue, GRA",
+        "addressLocality": "Aba",
+        "addressRegion": "Abia",
+        "postalCode": "450101",
+        "addressCountry": "NG"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "5.1065",
+        "longitude": "7.3528"
+      },
+      "hasMap": "https://www.google.com/maps/search/?api=1&query=49H9+6M+Aba",
+      "starRating": {
+        "@type": "Rating",
+        "ratingValue": "4"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.4",
+        "reviewCount": "101"
+      },
+      "amenityFeature": [
+        { "@type": "LocationFeatureSpecification", "name": "Free Wi-Fi", "value": "true" },
+        { "@type": "LocationFeatureSpecification", "name": "Free Breakfast", "value": "true" },
+        { "@type": "LocationFeatureSpecification", "name": "Free Parking", "value": "true" },
+        { "@type": "LocationFeatureSpecification", "name": "Pool", "value": "true" },
+        { "@type": "LocationFeatureSpecification", "name": "Air-conditioned", "value": "true" }
+      ],
+      "priceRange": "₦80,500 - ₦126,831"
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'hotel-teal': {
+                            DEFAULT: '#0d5c5c',
+                            dark: '#083d3d',
+                            light: '#1a7a7a',
+                        },
+                        'hotel-neutral': {
+                            50: '#FAF9F6',
+                            100: '#F5F5F0',
+                            200: '#E8E8E0',
+                            800: '#2D2D2A',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'display': ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .hero-gradient {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+        }
+        .animate-fade-in {
+            animation: fadeIn 1s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Mobile Menu Transitions */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+        }
+        #mobile-menu.hidden-menu {
+            transform: translateX(100%);
+        }
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body class="bg-hotel-neutral-50 font-sans text-hotel-neutral-800 overflow-x-hidden">
+
+    <!-- Mobile Navigation Menu -->
+    <div id="mobile-menu" class="fixed top-0 right-0 bottom-0 w-72 max-w-[75vw] z-[100] bg-white shadow-2xl hidden-menu lg:hidden">
+        <div class="p-6 h-full flex flex-col">
+            <div class="flex justify-between items-center mb-12">
+                <span class="text-xl font-display font-bold text-hotel-teal uppercase tracking-wider">West-Swiss</span>
+                <button id="close-menu" class="p-2 text-hotel-neutral-800">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-6 text-lg font-display font-semibold">
+                <a href="{% url 'home' %}" class="mobile-link {% if request.resolver_match.url_name == 'home' %}text-hotel-teal{% endif %} hover:text-hotel-teal transition-colors">Home</a>
+                <a href="{% url 'home' %}#rooms" class="mobile-link hover:text-hotel-teal transition-colors">Rooms</a>
+                <a href="{% url 'home' %}#amenities" class="mobile-link hover:text-hotel-teal transition-colors">Amenities</a>
+                <a href="{% url 'home' %}#dining" class="mobile-link hover:text-hotel-teal transition-colors">Dining</a>
+                <a href="{% url 'home' %}#gallery" class="mobile-link hover:text-hotel-teal transition-colors">Gallery</a>
+                <a href="{% url 'home' %}#contact" class="mobile-link hover:text-hotel-teal transition-colors">Contact</a>
+            </div>
+            <div class="mt-auto pt-8">
+                <a href="{% url 'home' %}#contact" class="mobile-link bg-hotel-teal text-white w-full py-3.5 rounded-xl text-center block shadow-lg hover:bg-hotel-teal-dark transition-colors">Book Now</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99] hidden opacity-0 transition-opacity duration-300 lg:hidden"></div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-hotel-neutral-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0">
+                    <a href="{% url 'home' %}" class="text-2xl font-display font-bold text-hotel-teal uppercase tracking-wider">West-Swiss</a>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-medium">
+                    <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}text-hotel-teal border-b-2 border-hotel-teal pb-1{% else %}hover:text-hotel-teal transition-colors{% endif %}">Home</a>
+                    <a href="{% url 'home' %}#rooms" class="hover:text-hotel-teal transition-colors">Rooms</a>
+                    <a href="{% url 'home' %}#amenities" class="hover:text-hotel-teal transition-colors">Amenities</a>
+                    <a href="{% url 'home' %}#dining" class="hover:text-hotel-teal transition-colors">Dining</a>
+                    <a href="{% url 'home' %}#gallery" class="hover:text-hotel-teal transition-colors">Gallery</a>
+                    <a href="{% url 'home' %}#contact" class="hover:text-hotel-teal transition-colors">Contact</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'home' %}#contact" class="hidden sm:block bg-hotel-teal text-white px-6 py-2.5 rounded-full font-semibold hover:bg-hotel-teal-dark transition-all shadow-md">Book Now</a>
+                    <button id="menu-toggle" class="md:hidden p-2 text-hotel-teal">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    {% block content %}
+    {% endblock %}
+
+    <!-- Footer -->
+    <footer class="bg-hotel-neutral-800 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-12 text-center md:text-left mb-12">
+                <div>
+                    <span class="text-2xl font-display font-bold text-white uppercase tracking-wider mb-6 block">West-Swiss Aba</span>
+                    <p class="text-white/60 text-sm leading-relaxed">
+                        Experience premium hospitality in the heart of Abia. Serene dining, luxury rooms, and local convenience.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 uppercase tracking-widest text-xs text-hotel-teal-light">Contact Info</h4>
+                    <address class="not-italic text-white/80 space-y-3 text-sm">
+                        <p>23A Margaret Avenue, GRA,<br>Aba 450101, Abia</p>
+                        <p>Phone: [Add hotel phone]</p>
+                        <p>Plus Code: 49H9+6M Aba</p>
+                    </address>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 uppercase tracking-widest text-xs text-hotel-teal-light">Quick Links</h4>
+                    <div class="flex flex-col space-y-3 text-sm text-white/60">
+                        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                        <a href="/sitemap.xml" class="hover:text-white transition-colors">Sitemap</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 text-center">
+                <p class="text-white/40 text-xs tracking-widest uppercase">&copy; 2026 West-Swiss Hotel Aba. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile Menu Logic
+        const menuToggle = document.getElementById('menu-toggle');
+        const closeMenu = document.getElementById('close-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        const toggleMenu = () => {
+            mobileMenu.classList.toggle('hidden-menu');
+            mobileOverlay.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
+            
+            // Fade in overlay
+            setTimeout(() => {
+                mobileOverlay.classList.toggle('opacity-0');
+            }, 10);
+        };
+
+        const closeMenuFunc = () => {
+            mobileMenu.classList.add('hidden-menu');
+            mobileOverlay.classList.add('opacity-0');
+            document.body.classList.remove('overflow-hidden');
+            
+            setTimeout(() => {
+                mobileOverlay.classList.add('hidden');
+            }, 300);
+        };
+
+        if(menuToggle) menuToggle.addEventListener('click', toggleMenu);
+        if(closeMenu) closeMenu.addEventListener('click', closeMenuFunc);
+        if(mobileOverlay) mobileOverlay.addEventListener('click', closeMenuFunc);
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', closeMenuFunc);
+        });
+
+        {% block extra_js %}{% endblock %}
+    </script>
+</body>
+</html>
