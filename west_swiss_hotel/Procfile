@@ -1,1 +1,1 @@
-web: gunicorn west_swiss_hotel.wsgi
+web: python -m gunicorn west_swiss_hotel.wsgi:application

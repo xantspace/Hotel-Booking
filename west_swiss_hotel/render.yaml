@@ -3,7 +3,7 @@ services:
     name: west-swiss-hotel
     env: python
     buildCommand: ./build.sh
-    startCommand: gunicorn west_swiss_hotel.wsgi
+    startCommand: python -m gunicorn west_swiss_hotel.wsgi:application
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.5
