@@ -119,3 +119,16 @@ class BookingForm(forms.Form):
                 raise forms.ValidationError("Check-in date cannot be in the past.")
         
         return cleaned_data
+
+class RoomForm(forms.ModelForm):
+    class Meta:
+        model = Room
+        fields = ['room_type', 'total_inventory', 'price_per_night', 'view_type', 'description', 'image', 'has_wifi', 'has_breakfast', 'has_ac']
+        widgets = {
+            'room_type': forms.Select(attrs={'class': 'w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-hotel-teal/20 outline-none'}),
+            'total_inventory': forms.NumberInput(attrs={'class': 'w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-hotel-teal/20 outline-none', 'min': 1}),
+            'price_per_night': forms.NumberInput(attrs={'class': 'w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-hotel-teal/20 outline-none'}),
+            'view_type': forms.TextInput(attrs={'class': 'w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-hotel-teal/20 outline-none', 'placeholder': 'e.g. Garden View'}),
+            'description': forms.Textarea(attrs={'class': 'w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-hotel-teal/20 outline-none', 'rows': 4}),
+            'image': forms.FileInput(attrs={'class': 'w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-hotel-teal/20 outline-none'}),
+        }

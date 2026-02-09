@@ -109,6 +109,10 @@ STATICFILES_DIRS = [
 # Static root for collectstatic
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Media files (Uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # WhiteNoise storage to compress and cache static files
 if whitenoise:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

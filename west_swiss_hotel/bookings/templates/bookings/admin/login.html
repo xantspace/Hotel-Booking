@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | West-Swiss Hotel Aba</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'hotel-teal': {
+                            DEFAULT: '#0d5c5c',
+                            dark: '#083d3d',
+                            light: '#1a7a7a',
+                        },
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'display': ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0d5c5c 0%, #083d3d 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px border rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="w-full max-w-md animate-fade-in">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-display font-bold text-white uppercase tracking-wider mb-2">West-Swiss</h1>
+            <p class="text-white/60 text-sm tracking-widest uppercase">Admin Management Portal</p>
+        </div>
+
+        <div class="glass rounded-3xl p-8 md:p-10">
+            <h2 class="text-2xl font-display font-semibold text-white mb-8">Login to Dashboard</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                <div class="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-white/40">Username</label>
+                    <input type="text" name="username" required 
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-hotel-teal-light transition-all"
+                        placeholder="Admin username">
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-white/40">Password</label>
+                    <input type="password" name="password" required 
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-hotel-teal-light transition-all"
+                        placeholder="••••••••">
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" 
+                        class="w-full bg-white text-hotel-teal font-bold py-4 rounded-xl shadow-xl hover:bg-hotel-neutral-100 transform hover:-translate-y-1 transition-all active:scale-95">
+                        Access Dashboard
+                    </button>
+                </div>
+            </form>
+            
+            <div class="mt-8 text-center">
+                <a href="{% url 'home' %}" class="text-white/40 text-sm hover:text-white transition-colors">Return to main site</a>
+            </div>
+        </div>
+        
+        <p class="mt-10 text-center text-white/30 text-xs uppercase tracking-widest">
+            &copy; 2026 West-Swiss Hotel Aba Secure Portal
+        </p>
+    </div>
+</body>
+</html>

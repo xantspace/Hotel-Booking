@@ -114,10 +114,45 @@
         #mobile-menu.hidden-menu {
             transform: translateX(100%);
         }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translate(-50%, 20px) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+        @keyframes slideOutDown {
+            from { opacity: 1; transform: translate(-50%, 0) scale(1); }
+            to { opacity: 0; transform: translate(-50%, 20px) scale(0.9); }
+        }
+        .toast-entrance { animation: slideInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .toast-exit { animation: slideOutDown 0.4s cubic-bezier(0.36, 0, 0.66, -0.56) forwards; }
         {% block extra_css %}{% endblock %}
     </style>
 </head>
 <body class="bg-hotel-neutral-50 font-sans text-hotel-neutral-800 overflow-x-hidden">
+    <!-- Message Pop-up Container -->
+    <div id="toast-container" class="fixed bottom-12 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md px-4 pointer-events-none">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="toast-entrance bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 p-6 flex items-center space-x-5 pointer-events-auto">
+                <div class="flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center {% if message.tags == 'success' %}bg-green-50 text-green-500{% else %}bg-red-50 text-red-500{% endif %}">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {% if message.tags == 'success' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                        {% else %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                        {% endif %}
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-1">{% if message.tags == 'success' %}Confirmation{% else %}Notification{% endif %}</p>
+                    <p class="text-base font-bold text-slate-800 leading-tight">{{ message }}</p>
+                </div>
+                <button onclick="dismissToast(this.parentElement)" class="text-slate-300 hover:text-slate-500 transition-all p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
     <!-- Mobile Navigation Menu -->
     <div id="mobile-menu" class="fixed top-0 right-0 bottom-0 w-72 max-w-[75vw] z-[100] bg-white shadow-2xl hidden-menu lg:hidden">
@@ -245,7 +280,48 @@
             link.addEventListener('click', closeMenuFunc);
         });
 
-        {% block extra_js %}{% endblock %}
+        // Toast Logic
+        const dismissToast = (toast) => {
+            if(!toast) return;
+            toast.classList.add('toast-exit');
+            setTimeout(() => toast.remove(), 500);
+        };
+
+        const showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-entrance bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 p-6 flex items-center space-x-5 pointer-events-auto mt-4';
+            
+            const iconBg = type === 'success' ? 'bg-green-50 text-green-500' : 'bg-red-50 text-red-500';
+            const iconPath = type === 'success' 
+                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>'
+                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>';
+            
+            toast.innerHTML = `
+                <div class="flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center ${iconBg}">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconPath}</svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-1">${type === 'success' ? 'Confirmation' : 'Note'}</p>
+                    <p class="text-base font-bold text-slate-800 leading-tight">${message}</p>
+                </div>
+                <button onclick="dismissToast(this.parentElement)" class="text-slate-300 hover:text-slate-500 transition-all p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => dismissToast(toast), 5000);
+        };
+
+        // Auto-dismiss existing toasts
+        document.querySelectorAll('.toast-entrance').forEach(toast => {
+            setTimeout(() => dismissToast(toast), 5000);
+        });
+
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

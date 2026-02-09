@@ -1,0 +1,60 @@
+{% extends 'bookings/admin/base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Manage Rooms | West-Swiss Admin{% endblock %}
+{% block header_title %}Room Inventory{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h4 class="font-display font-bold text-slate-800 uppercase tracking-wider text-xs">Inventory Overview</h4>
+    <a href="{% url 'add_room' %}" class="bg-hotel-teal text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-hotel-teal-dark transition-all flex items-center shadow-lg">
+        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+        Add New Room
+    </a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for room in rooms %}
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+        <div class="h-48 bg-slate-100 relative overflow-hidden">
+            {% if room.image %}
+            <img src="{{ room.image.url }}" alt="{{ room.get_room_type_display }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            {% else %}
+            <div class="w-full h-full flex items-center justify-center text-slate-300">
+                <i data-lucide="image" class="w-12 h-12"></i>
+            </div>
+            {% endif %}
+            <div class="absolute top-4 right-4 capitalize">
+                <span class="px-3 py-1 rounded-full text-[10px] font-bold shadow-sm bg-slate-800 text-white">
+                    {{ room.total_inventory }} Rooms
+                </span>
+            </div>
+        </div>
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h5 class="text-sm font-bold text-slate-800">{{ room.get_room_type_display }}</h5>
+                    <p class="text-xs text-slate-400 font-medium">{{ room.view_type }}</p>
+                </div>
+                <span class="text-lg font-display font-bold text-hotel-teal">₦{{ room.price_per_night|floatformat:0|intcomma }}</span>
+            </div>
+            
+            <div class="flex items-center space-x-3 mb-6">
+                {% if room.has_wifi %}<i data-lucide="wifi" class="w-4 h-4 text-slate-300" title="Free Wi-Fi"></i>{% endif %}
+                {% if room.has_ac %}<i data-lucide="wind" class="w-4 h-4 text-slate-300" title="Air Conditioned"></i>{% endif %}
+                {% if room.has_breakfast %}<i data-lucide="coffee" class="w-4 h-4 text-slate-300" title="Breakfast Included"></i>{% endif %}
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{% url 'edit_room' room.id %}" class="py-2 border border-slate-100 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors text-center">
+                    Edit Details
+                </a>
+                <button class="py-2 border border-slate-100 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                    View Schedule
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

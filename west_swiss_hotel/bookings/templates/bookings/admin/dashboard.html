@@ -1,0 +1,147 @@
+{% extends 'bookings/admin/base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard | West-Swiss Admin{% endblock %}
+{% block header_title %}Overview{% endblock %}
+
+{% block content %}
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-hotel-teal/10 rounded-xl text-hotel-teal">
+                    <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded">+12%</span>
+            </div>
+            <p class="text-slate-400 text-sm font-medium mb-1">Total Bookings</p>
+            <h3 class="text-2xl font-display font-bold text-slate-800">{{ all_bookings_count }}</h3>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
+                    <i data-lucide="clock" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded">Action Needed</span>
+            </div>
+            <p class="text-slate-400 text-sm font-medium mb-1">Pending Bookings</p>
+            <h3 class="text-2xl font-display font-bold text-slate-800">{{ pending_bookings_count }}</h3>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
+                    <i data-lucide="door-open" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-bold text-slate-400">{{ available_rooms_count }} Vacant</span>
+            </div>
+            <p class="text-slate-400 text-sm font-medium mb-1">Total Rooms</p>
+            <h3 class="text-2xl font-display font-bold text-slate-800">{{ total_rooms_count }}</h3>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-green-50 rounded-xl text-green-600">
+                    <i data-lucide="banknote" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded">30 Days</span>
+            </div>
+            <p class="text-slate-400 text-sm font-medium mb-1">Monthly Revenue</p>
+            <h3 class="text-2xl font-display font-bold text-slate-800">₦{{ monthly_revenue|floatformat:0|intcomma }}</h3>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Recent Bookings Table -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h4 class="font-display font-bold text-slate-800 uppercase tracking-wider text-xs">Recent Bookings</h4>
+                <a href="{% url 'admin_bookings' %}" class="text-hotel-teal text-xs font-bold hover:underline">View All</a>
+            </div>
+            <div class="flex-1 overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-50/50 text-[10px] uppercase tracking-widest font-bold text-slate-400">
+                            <th class="px-6 py-4">Guest</th>
+                            <th class="px-6 py-4">Room</th>
+                            <th class="px-6 py-4">Dates</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for booking in bookings %}
+                        <tr class="group hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-[10px]">
+                                        {{ booking.guest_name|slice:":1" }}
+                                    </div>
+                                    <span class="text-sm font-semibold text-slate-700">{{ booking.guest_name }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-xs font-bold text-slate-500">
+                                {{ booking.room.get_room_type_display }}
+                            </td>
+                            <td class="px-6 py-4 text-xs font-medium text-slate-400">
+                                {{ booking.check_in|date:"M d" }} — {{ booking.check_out|date:"M d" }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full 
+                                    {% if booking.status == 'PENDING' %}bg-amber-50 text-amber-600
+                                    {% elif booking.status == 'CONFIRMED' or booking.status == 'CHECKED_IN' %}bg-green-50 text-green-600
+                                    {% else %}bg-slate-100 text-slate-500{% endif %}">
+                                    {{ booking.status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-bold text-slate-800">
+                                ₦{{ booking.total_price|floatformat:0|intcomma }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sidebar Widgets -->
+        <div class="space-y-8">
+            <!-- Current Status -->
+            <div class="bg-hotel-teal text-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                <h4 class="font-display font-bold text-lg mb-6 flex items-center relative z-10">
+                    <i data-lucide="activity" class="w-5 h-5 mr-2 text-hotel-teal-light"></i>
+                    Live Status
+                </h4>
+                <div class="space-y-4 relative z-10">
+                    <div class="flex justify-between items-center bg-white/10 p-3 rounded-xl border border-white/10">
+                        <span class="text-xs font-bold uppercase tracking-widest text-white/60">Today's Inquiries</span>
+                        <span class="text-xl font-bold">{{ today_bookings_count }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-white/10 p-3 rounded-xl border border-white/10">
+                        <span class="text-xs font-bold uppercase tracking-widest text-white/60">Available Rooms</span>
+                        <span class="text-xl font-bold">{{ available_rooms_count }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News/Messages Shortlist -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                <h4 class="font-display font-bold text-slate-800 uppercase tracking-wider text-xs mb-6">Unread Messages</h4>
+                {% if message_count > 0 %}
+                <div class="flex items-center justify-between p-4 bg-amber-50 border border-amber-100 rounded-xl mb-4">
+                    <div class="flex items-center">
+                        <i data-lucide="mail-warning" class="w-5 h-5 text-amber-600 mr-2"></i>
+                        <span class="text-xs font-bold text-amber-800">{{ message_count }} New Messages</span>
+                    </div>
+                    <a href="{% url 'admin_messages' %}" class="text-[10px] font-bold text-amber-600 uppercase hover:underline">Read</a>
+                </div>
+                {% else %}
+                <p class="text-xs text-slate-400 italic">No unread messages</p>
+                {% endif %}
+                <a href="{% url 'admin_messages' %}" class="w-full mt-4 block py-3 border border-slate-100 rounded-xl text-center text-[10px] font-bold text-slate-400 hover:bg-slate-50 transition-all uppercase tracking-widest">
+                    View All Messages
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

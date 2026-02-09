@@ -1,0 +1,122 @@
+{% extends 'bookings/admin/base_admin.html' %}
+
+{% block title %}Edit Room | West-Swiss Admin{% endblock %}
+{% block header_title %}Edit Room{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <h4 class="font-display font-bold text-slate-800 uppercase tracking-wider text-xs">Room Details</h4>
+            <a href="{% url 'admin_rooms' %}" class="text-slate-400 hover:text-hotel-teal transition-colors flex items-center text-xs font-bold uppercase tracking-widest">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                Back to List
+            </a>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data" class="p-8">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- Room Type -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-slate-400">Room Category</label>
+                    {{ form.room_type }}
+                    {% if form.room_type.errors %}
+                        <p class="text-red-500 text-[10px]">{{ form.room_type.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Total Inventory -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-slate-400">Total Inventory</label>
+                    {{ form.total_inventory }}
+                    <p class="text-slate-400 text-[10px]">Total number of physical rooms of this type.</p>
+                    {% if form.total_inventory.errors %}
+                        <p class="text-red-500 text-[10px]">{{ form.total_inventory.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Price -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-slate-400">Price per Night (₦)</label>
+                    {{ form.price_per_night }}
+                    {% if form.price_per_night.errors %}
+                        <p class="text-red-500 text-[10px]">{{ form.price_per_night.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- View Type -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-slate-400">View Type</label>
+                    {{ form.view_type }}
+                </div>
+
+                <!-- Image Upload -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-slate-400">Room Photo</label>
+                    <div class="flex items-center space-x-4">
+                        {% if form.instance.image %}
+                        <img src="{{ form.instance.image.url }}" class="w-12 h-12 rounded-lg object-cover border border-slate-200">
+                        {% endif %}
+                        {{ form.image }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-2 mb-8">
+                <label class="block text-xs font-bold uppercase tracking-widest text-slate-400">Description</label>
+                {{ form.description }}
+            </div>
+
+            <!-- Amenities Checkboxes -->
+            <div class="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-100">
+                <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 font-display">Status & Amenities</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+                    <label class="flex items-center space-x-3 cursor-pointer group">
+                        <div class="relative">
+                            {{ form.has_wifi }}
+                        </div>
+                        <span class="text-sm font-medium text-slate-600 group-hover:text-hotel-teal transition-colors">Free Wi-Fi</span>
+                    </label>
+
+                    <label class="flex items-center space-x-3 cursor-pointer group">
+                        <div class="relative">
+                            {{ form.has_ac }}
+                        </div>
+                        <span class="text-sm font-medium text-slate-600 group-hover:text-hotel-teal transition-colors">Air Conditioning</span>
+                    </label>
+
+                    <label class="flex items-center space-x-3 cursor-pointer group">
+                        <div class="relative">
+                            {{ form.has_breakfast }}
+                        </div>
+                        <span class="text-sm font-medium text-slate-600 group-hover:text-hotel-teal transition-colors">Free Breakfast</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'admin_rooms' %}" class="px-6 py-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all">Cancel</a>
+                <button type="submit" class="bg-hotel-teal text-white px-10 py-4 rounded-xl font-bold hover:bg-hotel-teal-dark transition-all shadow-xl hover:-translate-y-1 transform active:scale-95">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    input[type="checkbox"] {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 0.375rem;
+        border-color: #e2e8f0;
+        accent-color: #0d5c5c;
+    }
+</style>
+{% endblock %}

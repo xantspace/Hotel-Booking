@@ -54,9 +54,14 @@ class WestSwissAdminSite(admin.AdminSite):
         ).select_related('room').order_by('check_out')
         
         # Room availability
-        total_rooms = Room.objects.count()
-        available_rooms = Room.objects.filter(is_available=True).count()
-        occupancy_rate = ((total_rooms - available_rooms) / total_rooms * 100) if total_rooms > 0 else 0
+        total_capacity = Room.objects.aggregate(total=Sum('total_inventory'))['total'] or 0
+        current_bookings_count = Booking.objects.filter(
+            status__in=['CONFIRMED', 'CHECKED_IN'],
+            check_in__lte=today,
+            check_out__gt=today
+        ).count()
+        available_rooms = max(0, total_capacity - current_bookings_count)
+        occupancy_rate = (current_bookings_count / total_capacity * 100) if total_capacity > 0 else 0
         
         extra_context = extra_context or {}
         extra_context.update({
@@ -81,17 +86,18 @@ admin_site = WestSwissAdminSite(name='westswiss_admin')
 
 @admin.register(Room, site=admin_site)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('id', 'room_type_badge', 'view_type', 'price_display', 'is_available', 'availability_badge', 'amenities_display')
-    list_filter = ('room_type', 'view_type', 'is_available', 'has_wifi', 'has_breakfast', 'has_ac')
+    list_display = ('id', 'room_type_badge', 'view_type', 'price_display', 'total_inventory', 'get_current_availability', 'amenities_display')
+    list_filter = ('room_type', 'view_type', 'has_wifi', 'has_breakfast', 'has_ac')
     search_fields = ('description',)
-    list_editable = ('is_available',)
-    actions = ['mark_available', 'mark_unavailable', 'increase_price_5', 'decrease_price_5']
+    list_editable = ('total_inventory',)
+    actions = ['increase_price_5', 'decrease_price_5']
     
     def room_type_badge(self, obj):
         colors = {
             'STANDARD': '#10b981',
             'DELUXE': '#3b82f6',
             'EXECUTIVE': '#8b5cf6',
+            'PRESIDENTIAL': '#f43f5e',
         }
         return format_html(
             '<span style="background-color: {}; color: white; padding: 4px 12px; border-radius: 12px; font-weight: bold; font-size: 11px;">{}</span>',
@@ -106,11 +112,16 @@ class RoomAdmin(admin.ModelAdmin):
     price_display.short_description = 'Price/Night'
     price_display.admin_order_field = 'price_per_night'
     
-    def availability_badge(self, obj):
-        if obj.is_available:
-            return mark_safe('<span style="color: #10b981; font-weight: bold;">● Available</span>')
-        return mark_safe('<span style="color: #ef4444; font-weight: bold;">● Unavailable</span>')
-    availability_badge.short_description = 'Status'
+    def get_current_availability(self, obj):
+        today = timezone.now().date()
+        tomorrow = today + timedelta(days=1)
+        avail = obj.get_available_inventory(today, tomorrow)
+        color = '#10b981' if avail > 0 else '#ef4444'
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">● {} / {} Free</span>',
+            color, avail, obj.total_inventory
+        )
+    get_current_availability.short_description = 'Available Today'
     
     def amenities_display(self, obj):
         amenities = []
@@ -123,15 +134,6 @@ class RoomAdmin(admin.ModelAdmin):
         return ', '.join(amenities) if amenities else 'None'
     amenities_display.short_description = 'Amenities'
     
-    def mark_available(self, request, queryset):
-        updated = queryset.update(is_available=True)
-        self.message_user(request, f'{updated} room(s) marked as available.')
-    mark_available.short_description = "Mark selected rooms as available"
-    
-    def mark_unavailable(self, request, queryset):
-        updated = queryset.update(is_available=False)
-        self.message_user(request, f'{updated} room(s) marked as unavailable.')
-    mark_unavailable.short_description = "Mark selected rooms as unavailable"
     
     def increase_price_5(self, request, queryset):
         for room in queryset:

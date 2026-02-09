@@ -6,19 +6,33 @@ class Room(models.Model):
         STANDARD = 'STANDARD', _('Standard Room')
         DELUXE = 'DELUXE', _('Deluxe Suite')
         EXECUTIVE = 'EXECUTIVE', _('Executive King')
+        PRESIDENTIAL = 'PRESIDENTIAL', _('Presidential Suite')
 
     room_type = models.CharField(max_length=20, choices=RoomType.choices, default=RoomType.STANDARD)
+    total_inventory = models.PositiveIntegerField(default=1, help_text="Total number of rooms of this type")
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
     view_type = models.CharField(max_length=50, blank=True, null=True, help_text="e.g. Pool View, City View")
     description = models.TextField(blank=True)
-    is_available = models.BooleanField(default=True)
-    image = models.URLField(blank=True, null=True, help_text="URL to room image")
+    image = models.ImageField(upload_to='rooms/', blank=True, null=True, help_text="Upload room image")
 
     # Core amenities
     has_wifi = models.BooleanField(default=True)
     has_breakfast = models.BooleanField(default=True)
     has_ac = models.BooleanField(default=True)
     
+    def get_available_inventory(self, check_in, check_out):
+        """Returns the number of available rooms for given dates"""
+        overlapping_bookings = self.bookings.filter(
+            status__in=['PENDING', 'CONFIRMED', 'CHECKED_IN'],
+            check_in__lt=check_out,
+            check_out__gt=check_in
+        ).count()
+        return max(0, self.total_inventory - overlapping_bookings)
+
+    def is_available(self, check_in, check_out):
+        """Returns True if there is at least one room available"""
+        return self.get_available_inventory(check_in, check_out) > 0
+
     def __str__(self):
         return f"{self.get_room_type_display()} - ₦{self.price_per_night}"
 
@@ -60,3 +74,15 @@ class OTARate(models.Model):
 
     def __str__(self):
         return f"{self.platform_name}: ₦{self.price}"
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Message from {self.name} - {self.subject}"

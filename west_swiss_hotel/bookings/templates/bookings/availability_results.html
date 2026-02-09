@@ -35,27 +35,45 @@
         <p class="text-hotel-neutral-800/60 mb-12">Showing all available rooms</p>
         {% endif %}
 
-        {% if available_rooms %}
+        {% if rooms_with_status %}
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-                {% for room in available_rooms %}
+                {% for item in rooms_with_status %}
+                    {% with room=item.room %}
                     <div class="bg-white rounded-3xl overflow-hidden border border-hotel-neutral-200 shadow-sm hover:shadow-xl transition-all">
                         <div class="h-64 overflow-hidden relative">
                             {% if room.image %}
-                                <img src="{{ room.image }}" alt="{{ room.get_room_type_display }}" class="w-full h-full object-cover">
+                                <img src="{{ room.image.url }}" alt="{{ room.get_room_type_display }}" class="w-full h-full object-cover">
                             {% else %}
                                 <div class="w-full h-full bg-hotel-teal/10 flex items-center justify-center">
                                     <svg class="w-12 h-12 text-hotel-teal/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                                 </div>
                             {% endif %}
-                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-hotel-teal">
-                                {{ room.view_type|default:"Standard View" }}
+                            <div class="absolute top-4 left-4 flex flex-col space-y-2">
+                                <span class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-hotel-teal uppercase tracking-wider">
+                                    {{ room.view_type|default:"Standard View" }}
+                                </span>
+                                {% if item.is_available %}
+                                <span class="bg-green-500 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-sm uppercase tracking-wider flex items-center">
+                                    <span class="w-1.5 h-1.5 bg-white rounded-full mr-2 animate-pulse"></span>
+                                    Available
+                                </span>
+                                {% else %}
+                                <span class="bg-red-500 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-sm uppercase tracking-wider flex items-center">
+                                    <span class="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                                    Sold Out
+                                </span>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="p-8">
                             <div class="flex justify-between items-start mb-4">
                                 <div>
                                     <h3 class="text-2xl font-display font-bold">{{ room.get_room_type_display }}</h3>
-                                    <p class="text-hotel-neutral-800/60 text-sm">{{ room.description|truncatewords:10 }}</p>
+                                    <p class="text-hotel-neutral-800/60 text-sm mb-2">{{ room.description|truncatewords:10 }}</p>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Inventory:</span>
+                                        <span class="text-xs font-bold text-hotel-neutral-800">{{ item.available_count }} / {{ room.total_inventory }} Free</span>
+                                    </div>
                                 </div>
                                 <div class="text-right">
                                     <span class="text-hotel-teal font-bold text-xl">₦{{ room.price_per_night|floatformat:0|intcomma }}</span>
@@ -75,18 +93,19 @@
                                     Free High-Speed Wi-Fi
                                 </li>
                                 {% endif %}
-                                {% if room.has_ac %}
-                                <li class="flex items-center text-sm text-hotel-neutral-800/80">
-                                    <svg class="w-4 h-4 mr-2 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    Air Conditioning
-                                </li>
-                                {% endif %}
                             </ul>
-                            <a href="{% url 'book_room' room.id %}?check_in={{ request.GET.check_in }}&check_out={{ request.GET.check_out }}&guests={{ request.GET.guests }}" class="block w-full bg-hotel-teal text-white py-3 rounded-xl font-bold hover:bg-hotel-teal-dark transition-all shadow-lg text-center">
-                                Book This Room
+                            {% if item.is_available %}
+                            <a href="{% url 'book_room' room.id %}?check_in={{ request.GET.check_in }}&check_out={{ request.GET.check_out }}&guests={{ request.GET.guests }}" class="block w-full bg-hotel-teal text-white py-4 rounded-xl font-bold hover:bg-hotel-teal-dark transition-all shadow-lg text-center uppercase tracking-widest text-xs">
+                                Book Now
                             </a>
+                            {% else %}
+                            <button disabled class="block w-full border-2 border-slate-200 text-slate-400 py-4 rounded-xl font-bold cursor-not-allowed uppercase tracking-widest text-xs">
+                                Sold Out for these dates
+                            </button>
+                            {% endif %}
                         </div>
                     </div>
+                    {% endwith %}
                 {% endfor %}
             </div>
 

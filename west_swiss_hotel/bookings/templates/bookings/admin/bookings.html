@@ -1,0 +1,89 @@
+{% extends 'bookings/admin/base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Manage Bookings | West-Swiss Admin{% endblock %}
+{% block header_title %}Bookings Management{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div class="flex items-center space-x-4">
+            <h4 class="font-display font-bold text-slate-800 uppercase tracking-wider text-xs">All Bookings</h4>
+            <span class="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold">{{ bookings.count }} Total</span>
+        </div>
+        <div class="flex space-x-2">
+            <!-- Filter buttons or Search could go here -->
+        </div>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-slate-50/50 text-[10px] uppercase tracking-widest font-bold text-slate-400 border-b border-slate-100">
+                    <th class="px-6 py-4">Ref</th>
+                    <th class="px-6 py-4">Guest Info</th>
+                    <th class="px-6 py-4">Room</th>
+                    <th class="px-6 py-4">Dates</th>
+                    <th class="px-6 py-4">Amount</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for booking in bookings %}
+                <tr class="group hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 text-xs font-bold text-slate-400">#{{ booking.id }}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-semibold text-slate-700">{{ booking.guest_name }}</span>
+                            <span class="text-[10px] text-slate-400">{{ booking.guest_email }}</span>
+                            <span class="text-[10px] text-slate-400">{{ booking.guest_phone }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-slate-600">{{ booking.room.get_room_type_display }}</span>
+                            <span class="text-[10px] text-slate-400">{{ booking.room.view_type }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-medium text-slate-600">{{ booking.check_in|date:"M d, Y" }}</span>
+                            <span class="text-[10px] text-slate-400">to {{ booking.check_out|date:"M d, Y" }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm font-bold text-hotel-teal">₦{{ booking.total_price|floatformat:0|intcomma }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <form action="{% url 'update_booking_status' booking.id %}" method="POST" class="flex items-center">
+                            {% csrf_token %}
+                            <select name="status" onchange="this.form.submit()" class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full cursor-pointer outline-none border-none
+                                {% if booking.status == 'PENDING' %}bg-amber-50 text-amber-600
+                                {% elif booking.status == 'CONFIRMED' %}bg-green-50 text-green-600
+                                {% elif booking.status == 'CHECKED_IN' %}bg-blue-50 text-blue-600
+                                {% elif booking.status == 'COMPLETED' %}bg-slate-100 text-slate-800
+                                {% else %}bg-red-50 text-red-600{% endif %}">
+                                <option value="PENDING" {% if booking.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                                <option value="CONFIRMED" {% if booking.status == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
+                                <option value="CHECKED_IN" {% if booking.status == 'CHECKED_IN' %}selected{% endif %}>Checked In</option>
+                                <option value="COMPLETED" {% if booking.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                                <option value="CANCELLED" {% if booking.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button class="p-2 text-slate-400 hover:text-hotel-teal transition-colors">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="px-6 py-12 text-center text-slate-400 italic text-sm">No bookings found in the system.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
