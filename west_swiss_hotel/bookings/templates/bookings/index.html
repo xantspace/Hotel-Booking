@@ -19,7 +19,7 @@
                 Free Wi-Fi • Free breakfast • Free parking — Book direct from <span class="font-bold text-white">₦{{ official_price|floatformat:0|intcomma }}</span> or compare prices with major booking platforms.
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 lg:hidden">
-                <a href="#rooms" class="w-full sm:w-auto bg-hotel-teal text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-hotel-teal-dark transition-all shadow-xl hover:-translate-y-1 block text-center">
+                <a href="{% url 'check_availability' %}" class="w-full sm:w-auto bg-hotel-teal text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-hotel-teal-dark transition-all shadow-xl hover:-translate-y-1 block text-center">
                     Check availability
                 </a>
                 <button class="w-full sm:w-auto bg-white text-hotel-teal px-8 py-4 rounded-xl font-bold text-lg hover:bg-hotel-neutral-100 transition-all shadow-xl block">
