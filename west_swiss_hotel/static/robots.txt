@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://westswisshotelaba.com/sitemap.xml
+Sitemap: https://hotel-booking-y49f.onrender.com/sitemap.xm
+
