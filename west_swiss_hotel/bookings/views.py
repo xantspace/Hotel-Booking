@@ -288,6 +288,11 @@ def booking_confirmation(request, booking_id):
     num_nights = (booking.check_out - booking.check_in).days
     return render(request, 'bookings/booking_confirmation.html', {'booking': booking, 'num_nights': num_nights})
 
+def room_detail(request, room_id):
+    """Display detailed information about a specific room"""
+    room = get_object_or_404(Room, id=room_id)
+    return render(request, 'bookings/room_detail.html', {'room': room})
+
 # --- Admin Custom Views ---
 
 def admin_login(request):

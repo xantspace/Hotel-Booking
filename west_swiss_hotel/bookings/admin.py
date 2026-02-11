@@ -84,12 +84,17 @@ class WestSwissAdminSite(admin.AdminSite):
 # Create custom admin site instance
 admin_site = WestSwissAdminSite(name='westswiss_admin')
 
+class RoomImageInline(admin.TabularInline):
+    model = Room.images.rel.related_model
+    extra = 1
+
 @admin.register(Room, site=admin_site)
 class RoomAdmin(admin.ModelAdmin):
     list_display = ('id', 'room_type_badge', 'view_type', 'price_display', 'total_inventory', 'get_current_availability', 'amenities_display')
     list_filter = ('room_type', 'view_type', 'has_wifi', 'has_breakfast', 'has_ac')
     search_fields = ('description',)
     list_editable = ('total_inventory',)
+    inlines = [RoomImageInline]
     actions = ['increase_price_5', 'decrease_price_5']
     
     def room_type_badge(self, obj):

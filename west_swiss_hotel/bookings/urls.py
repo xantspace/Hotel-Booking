@@ -6,6 +6,7 @@ urlpatterns = [
     path('check-availability/', views.check_availability, name='check_availability'),
     path('contact/', views.contact_view, name='contact'),
     path('book/<int:room_id>/', views.book_room, name='book_room'),
+    path('room/<int:room_id>/', views.room_detail, name='room_detail'),
     path('booking-confirmation/<int:booking_id>/', views.booking_confirmation, name='booking_confirmation'),
     
     # Custom Admin URLs

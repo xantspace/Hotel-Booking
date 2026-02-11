@@ -1,0 +1,112 @@
+{% extends 'bookings/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ room.get_room_type_display }} | West-Swiss Hotel Aba{% endblock %}
+
+{% block content %}
+<div class="bg-white min-h-screen pb-20">
+
+    <!-- Hero / Title -->
+    <div class="bg-hotel-neutral-50 py-12 border-b border-hotel-neutral-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-display font-bold text-hotel-neutral-800 mb-4">{{ room.get_room_type_display }}</h1>
+            <div class="inline-flex items-center space-x-2 bg-white px-4 py-2 rounded-full border border-hotel-neutral-200 shadow-sm">
+                <span class="text-hotel-teal font-bold text-xl">₦{{ room.price_per_night|floatformat:0|intcomma }}</span>
+                <span class="text-xs uppercase font-bold tracking-widest text-slate-400">Per Night</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid lg:grid-cols-2 gap-12">
+            
+            <!-- Left Column: Gallery -->
+            <div class="space-y-4">
+                <!-- Main Image -->
+                <div class="aspect-w-4 aspect-h-3 rounded-3xl overflow-hidden shadow-2xl border border-hotel-neutral-200 group relative">
+                    <img id="main-image" src="{% if room.image %}{{ room.image.url }}{% else %}https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=1200{% endif %}" 
+                         alt="{{ room.get_room_type_display }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                </div>
+
+                <!-- Thumbnails -->
+                <div class="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
+                    {% if room.image %}
+                    <button onclick="changeImage('{{ room.image.url }}')" class="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 border-transparent hover:border-hotel-teal transition-all focus:border-hotel-teal focus:outline-none">
+                        <img src="{{ room.image.url }}" class="w-full h-full object-cover">
+                    </button>
+                    {% endif %}
+                    
+                    {% for img in room.images.all %}
+                    <button onclick="changeImage('{{ img.image.url }}')" class="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 border-transparent hover:border-hotel-teal transition-all focus:border-hotel-teal focus:outline-none">
+                        <img src="{{ img.image.url }}" class="w-full h-full object-cover">
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Right Column: Details -->
+            <div class="flex flex-col h-full">
+                <div class="bg-hotel-neutral-50 p-8 rounded-3xl border border-hotel-neutral-200 shadow-sm mb-8">
+                    <h3 class="font-display font-bold text-2xl text-hotel-neutral-800 mb-4">Room Details</h3>
+                    <div class="prose prose-slate text-hotel-neutral-800/70 mb-8 max-w-none leading-relaxed">
+                        {{ room.description|linebreaks }}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        {% if room.view_type %}
+                        <div class="flex items-center space-x-3 text-sm font-medium text-hotel-neutral-800">
+                            <svg class="w-5 h-5 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <span>{{ room.view_type }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="flex items-center space-x-3 text-sm font-medium text-hotel-neutral-800">
+                            <svg class="w-5 h-5 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            <span>{{ room.total_inventory }} Rooms Total</span>
+                        </div>
+                    </div>
+
+                    <h4 class="font-bold text-sm uppercase tracking-wider text-slate-400 mb-4">Amenities</h4>
+                    <ul class="space-y-3">
+                        {% if room.has_breakfast %}
+                        <li class="flex items-center text-hotel-neutral-800">
+                            <svg class="w-5 h-5 mr-3 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Complimentary Breakfast
+                        </li>
+                        {% endif %}
+                        {% if room.has_wifi %}
+                        <li class="flex items-center text-hotel-neutral-800">
+                            <svg class="w-5 h-5 mr-3 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Free High-Speed Wi-Fi
+                        </li>
+                        {% endif %}
+                        {% if room.has_ac %}
+                        <li class="flex items-center text-hotel-neutral-800">
+                            <svg class="w-5 h-5 mr-3 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Air Conditioning
+                        </li>
+                        {% endif %}
+                        <li class="flex items-center text-hotel-neutral-800">
+                            <svg class="w-5 h-5 mr-3 text-hotel-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Daily Housekeeping
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mt-auto">
+                    <a href="{% url 'book_room' room.id %}" class="block w-full text-center bg-hotel-teal text-white py-5 rounded-xl font-bold text-xl hover:bg-hotel-teal-dark transition-all shadow-xl hover:-translate-y-1">
+                        Book This Room Now
+                    </a>
+                    <p class="text-center text-xs text-slate-400 mt-4 uppercase tracking-wider">Instant Confirmation • Best Rate Guaranteed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeImage(src) {
+        document.getElementById('main-image').src = src;
+    }
+</script>
+{% endblock %}

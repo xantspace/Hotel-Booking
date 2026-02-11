@@ -13,7 +13,7 @@ class Room(models.Model):
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
     view_type = models.CharField(max_length=50, blank=True, null=True, help_text="e.g. Pool View, City View")
     description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='rooms/', blank=True, null=True, help_text="Upload room image")
+    image = models.ImageField(upload_to='rooms/', blank=True, null=True, help_text="Main room image")
 
     # Core amenities
     has_wifi = models.BooleanField(default=True)
@@ -35,6 +35,15 @@ class Room(models.Model):
 
     def __str__(self):
         return f"{self.get_room_type_display()} - ₦{self.price_per_night}"
+
+class RoomImage(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='rooms/gallery/')
+    caption = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for {self.room.get_room_type_display()}"
 
 class Booking(models.Model):
     class Status(models.TextChoices):
