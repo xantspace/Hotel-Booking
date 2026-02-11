@@ -248,6 +248,7 @@ def book_room(request, room_id):
 Thank you for your booking at West-Swiss Hotel Aba!
 
 Booking Details:
+- Reference: #{booking.display_id}
 - Room: {room.get_room_type_display()}
 - Check-in: {booking.check_in.strftime('%B %d, %Y')}
 - Check-out: {booking.check_out.strftime('%B %d, %Y')}
@@ -394,7 +395,7 @@ def update_booking_status(request, booking_id):
         if status in [s[0] for s in Booking.Status.choices]:
             booking.status = status
             booking.save()
-            messages.success(request, f'Booking #{booking.id} status updated to {status}.')
+            messages.success(request, f'Booking #{booking.display_id} status updated to {status}.')
     return redirect('admin_bookings')
 
 @login_required(login_url='admin_login')

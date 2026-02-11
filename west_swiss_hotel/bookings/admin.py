@@ -183,7 +183,7 @@ class BookingAdmin(admin.ModelAdmin):
     )
     
     def booking_ref(self, obj):
-        return f'#{obj.id}'
+        return f'#{obj.display_id}'
     booking_ref.short_description = 'Ref'
     
     def guest_name_link(self, obj):
@@ -244,7 +244,7 @@ class BookingAdmin(admin.ModelAdmin):
             '<p><strong>Guests:</strong> {}</p>'
             '<p><strong>Total:</strong> ₦{}</p>'
             '</div>',
-            obj.id,
+            obj.display_id,
             obj.guest_name, obj.guest_email,
             obj.room.get_room_type_display(),
             num_nights, obj.check_in.strftime('%B %d, %Y'), obj.check_out.strftime('%B %d, %Y'),

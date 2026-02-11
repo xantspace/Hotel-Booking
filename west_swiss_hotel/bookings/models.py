@@ -67,8 +67,12 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     special_requests = models.TextField(blank=True, null=True)
 
+    @property
+    def display_id(self):
+        return f"WSH{self.id:03d}"
+
     def __str__(self):
-        return f"Booking {self.id} - {self.guest_name}"
+        return f"Booking #{self.display_id} - {self.guest_name}"
 
 class OTARate(models.Model):
     platform_name = models.CharField(max_length=100, help_text="e.g. Expedia, Hotels.ng")
