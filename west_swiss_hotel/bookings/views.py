@@ -462,5 +462,16 @@ def edit_room(request, room_id):
     else:
         form = RoomForm(instance=room)
         
-    message_count = ContactMessage.objects.filter(is_read=False).count()
-    return render(request, 'bookings/admin/edit_room.html', {'form': form, 'room': room, 'message_count': message_count})
+@login_required(login_url='admin_login')
+def delete_room(request, room_id):
+    """Delete a room"""
+    if not request.user.is_staff: return redirect('home')
+    room = get_object_or_404(Room, id=room_id)
+    
+    if request.method == 'POST':
+        room_type = room.get_room_type_display()
+        room.delete()
+        messages.success(request, f'{room_type} deleted successfully!')
+        return redirect('admin_rooms')
+        
+    return redirect('admin_rooms')
