@@ -86,7 +86,7 @@ admin_site = WestSwissAdminSite(name='westswiss_admin')
 
 class RoomImageInline(admin.TabularInline):
     model = Room.images.rel.related_model
-    extra = 1
+    extra = 5
 
 @admin.register(Room, site=admin_site)
 class RoomAdmin(admin.ModelAdmin):
